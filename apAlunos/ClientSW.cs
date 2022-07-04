@@ -29,5 +29,30 @@ public class ClientSW
             catch (Exception) { MessageBox.Show("Erro ao se conectar."); }
         }
     }
+
+    public async void GetAlunoByRa(string url, DataGridView dgvAlunos, int ra)
+    {
+        using(var client = new HttpClient())
+        {
+            try
+            {
+                BindingSource bsDados = new BindingSource();
+                url = url + "/" + ra.ToString();
+
+                HttpResponseMessage response = await client.GetAsync(url);
+                if(response.IsSuccessStatusCode)
+                {
+                    var AlunoJsonString = await response.Content.ReadAsStringAsync();
+                    bsDados.DataSource = JsonConvert.DeserializeObject<apAlunos.InfoAluno[]>(AlunoJsonString);
+                    dgvAlunos.DataSource = bsDados;
+                }
+                else
+                {
+                    MessageBox.Show("Falha ao obter o produto : " + response.StatusCode);
+                }
+            }
+            catch (Exception) { MessageBox.Show("Falha ao se conectar com a API."); }
+        }
+    }
 }
 
